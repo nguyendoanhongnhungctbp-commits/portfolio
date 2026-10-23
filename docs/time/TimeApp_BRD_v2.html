@@ -1,0 +1,632 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Time App BRD v2</title><style>body{font:15px/1.6 system-ui,sans-serif;max-width:920px;margin:0 auto;padding:24px 16px;color:#10202b}table{border-collapse:collapse;display:block;overflow-x:auto;margin:12px 0}td,th{border:1px solid #dde3e8;padding:6px 10px;vertical-align:top;font-size:13.5px}th{background:#f3f6f7;text-align:left}h1,h2,h3{line-height:1.2}hr{border:0;border-top:1px solid #dde3e8}</style></head><body><h1 id="business-requirements-document">BUSINESS REQUIREMENTS DOCUMENT</h1>
+<h2 id="app-cham-cong-time">App Chấm Công — Time</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project Name</td>
+<td>App Chấm Công — Time</td>
+</tr>
+<tr>
+<td>Document #</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Creator</td>
+<td>ITBA Team</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>17/06/2026</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>2.0.0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-executive-summary">1. EXECUTIVE SUMMARY</h2>
+<p>Time is a lightweight mobile attendance app (iOS &amp; Android) designed for individual employees to self-track their daily working hours without requiring a company-side system. The app has no login or logout — it is a personal tool that runs persistently on the user's device.</p>
+<p>The core loop: the app reminds the user to check in at a configured time, tracks NET working hours through a visual progress ring, handles a fixed lunch break (12:00–13:00), sends reminders throughout the day, and records attendance history in a monthly report. Users can also mark days as Leave. No authentication, no server-side user management.</p>
+<hr />
+<h2 id="2-project-description">2. PROJECT DESCRIPTION</h2>
+<p>Time covers 3 main screens:
+- <strong>Home</strong> — progress ring, check-in/check-out, shift selection, lunch break display
+- <strong>Report</strong> — monthly attendance calendar, day detail, import/export
+- <strong>Profile &amp; Settings</strong> — avatar, name, attendance period, daily reminder time</p>
+<p>The app operates entirely from the user's device. Check-in and check-out are self-reported. Working hours are calculated as NET (lunch excluded) for the ring/goal and GROSS (check-out minus check-in) for Report and Widget display.</p>
+<hr />
+<h2 id="3-project-scope">3. PROJECT SCOPE</h2>
+<p><strong>Estimated duration:</strong> ~3 months
+<strong>Team:</strong> 01 PM, 01 BA, 02 Mobile Dev, 01 BE, 01 Tester, 01 UI/UX
+- Elicitation &amp; Design: 1 month
+- Development: 1.5 months
+- Testing &amp; QA: 0.5 months</p>
+<table>
+<thead>
+<tr>
+<th>IN-SCOPE</th>
+<th>OUT-OF-SCOPE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Profile setup (avatar, name, attendance period, reminder time)</td>
+<td>Login / Logout / Authentication</td>
+</tr>
+<tr>
+<td>Check In — Morning Shift (8h NET goal)</td>
+<td>Admin dashboard</td>
+</tr>
+<tr>
+<td>Check In — Afternoon Shift (4h NET goal, available after 12:00)</td>
+<td>Company-level management</td>
+</tr>
+<tr>
+<td>Leave Day marking</td>
+<td>Payroll integration</td>
+</tr>
+<tr>
+<td>Lunch break auto-pause (12:00–13:00, NET hours only)</td>
+<td>Biometric / GPS check-in</td>
+</tr>
+<tr>
+<td>Progress ring (NET hours real-time)</td>
+<td>Team / department reporting</td>
+</tr>
+<tr>
+<td>Widget — shows check-in time, check-out time, GROSS hours</td>
+<td>Leave approval workflow</td>
+</tr>
+<tr>
+<td>Monthly attendance report (calendar view)</td>
+<td>Overtime compensation tracking</td>
+</tr>
+<tr>
+<td>Day detail with edit capability</td>
+<td>Multi-device sync</td>
+</tr>
+<tr>
+<td>Summary card (on-time / incomplete / missing / leave counts)</td>
+<td></td>
+</tr>
+<tr>
+<td>Import data (CSV)</td>
+<td></td>
+</tr>
+<tr>
+<td>Export data</td>
+<td></td>
+</tr>
+<tr>
+<td>Reminder system (daily, 1-hour warning, completion, 18:00 check-out prompt)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-business-drivers">4. BUSINESS DRIVERS</h2>
+<table>
+<thead>
+<tr>
+<th>Driver</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BD1: Reduce missed attendance records</td>
+<td>Automated reminders prevent forgotten check-ins/outs, keeping attendance data complete without HR intervention.</td>
+</tr>
+<tr>
+<td>BD2: Individual accountability</td>
+<td>Employees self-track their hours in real-time, taking personal responsibility for attendance without depending on a company system.</td>
+</tr>
+<tr>
+<td>BD3: Flexible shift support</td>
+<td>Morning (8h) and Afternoon (4h) shift options accommodate diverse work schedules within one app.</td>
+</tr>
+<tr>
+<td>BD4: Fast-launch, learn early</td>
+<td>Focused Phase 1 scope enables a 3-month launch to gather real user feedback before Phase 2 expansion.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-present-process">5. PRESENT PROCESS</h2>
+<p>Details: Employees manually remember to record check-in/out via paper timesheets or a desktop-only HR portal. No reminders exist. Missed records require HR correction, delaying payroll.</p>
+<p><strong>Flow:</strong>
+1. Employee arrives at work [employee]
+2. Remembers/forgets to log check-in [employee]
+3. Remembers/forgets to log check-out [employee]
+4. Month-end: HR reviews records, finds errors [HR]
+5. Employee submits correction request [employee]
+6. HR manually approves and corrects [HR]
+7. Corrected records used for payroll calculation [HR]</p>
+<hr />
+<h2 id="6-proposed-process">6. PROPOSED PROCESS</h2>
+<p>With Time app, the employee receives a reminder at the configured time. They open the app, select their shift, and tap Check In. The progress ring counts NET working hours. At 12:00 the ring pauses for lunch and resumes at 13:00. The system sends reminders as the shift nears completion and at 18:00 if check-out hasn't been recorded.</p>
+<p><strong>Full daily flow:</strong></p>
+<ol>
+<li>System sends daily reminder at user-configured time: "Have you checked in?" [system]</li>
+<li>User opens Time app [user]</li>
+<li>User selects shift: <strong>Morning Shift</strong> (8h goal) or <strong>Afternoon Shift</strong> (4h goal, available after 12:00) or <strong>Leave Day</strong> [user]</li>
+</ol>
+<p><strong>Morning Shift path:</strong>
+4. User taps Check In → system records check-in timestamp [system]
+5. Progress ring starts counting NET hours toward 8h goal [system]
+6. At 12:00 → ring pauses, turns orange, displays "Lunch Time" [system]
+7. At 13:00 → ring resumes automatically [system]
+8. System sends reminder: "1 hour remaining to complete your shift" [system] <em>(7h NET reached)</em>
+9. System sends reminder: "You've completed 8 hours — do you want to check out?" [system] <em>(8h NET reached)</em>
+10. If user has not checked out by 18:00 → system sends reminder: "Do you want to check out?" [system]
+11. User taps Check Out → system records check-out timestamp [system]
+12. Report updated: GROSS hours = check-out time − check-in time (lunch included in GROSS) [system]
+13. NET hours = GROSS − 1h lunch (if check-out is after 13:00) [system]</p>
+<p><strong>Afternoon Shift path:</strong>
+4a. User selects Afternoon Shift before 12:00 → Check In button disabled, ring shows countdown to 12:00 [system]
+4b. At/after 12:00 → Check In button becomes available [system]
+4c. User taps Check In → 4h NET goal timer starts [system]
+4d. System sends reminder: "1 hour remaining" at 3h NET mark, "Goal complete" at 4h NET [system]</p>
+<p><strong>Leave Day path:</strong>
+4x. User selects Leave Day → system records Full Day Leave for today [system]
+4y. All remaining reminders for today are cancelled [system]
+4z. Leave recorded in Report calendar for the day [system]</p>
+<hr />
+<h2 id="7-functional-requirements">7. FUNCTIONAL REQUIREMENTS</h2>
+<h3 id="priority-legend">Priority Legend</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>Immediate</td>
+<td>Critical — project not possible without this</td>
+</tr>
+<tr>
+<td>4</td>
+<td>High</td>
+<td>High priority; project can ship MVP without it</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Moderate</td>
+<td>Valuable but not MVP-blocking</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Low</td>
+<td>Nice to have</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="profile-settings">PROFILE &amp; SETTINGS</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-001</td>
+<td><strong>Avatar Setup:</strong> Default avatar is the app logo. User can upload a photo from the device library. Photo is auto-cropped to circle. Tapping Save replaces the logo with the selected photo everywhere in the app (Home header, Report). Save required — changes not persisted until Save is tapped.</td>
+<td>3</td>
+</tr>
+<tr>
+<td>FR-002</td>
+<td><strong>Name Setup:</strong> User can enter or edit their display name shown in the Home greeting ("Hello [Name]"). Save required — changes not persisted until Save is tapped. Default if no name set: display "Hello" without a name.</td>
+<td>3</td>
+</tr>
+<tr>
+<td>FR-003</td>
+<td><strong>Attendance Period Setup:</strong> User sets a monthly cutoff date (1–28). System calculates the attendance period as: cutoff day of previous month → (cutoff day − 1) of current month. Example: cutoff = 26 → period = 26th prev month to 25th current month. This period is used in the Report summary card. Save required.</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-004</td>
+<td><strong>Daily Check-In Reminder Time:</strong> User sets the time for the daily morning reminder (default: 08:45). At this time each day, the system sends a push notification: "Have you checked in?" Notification is not sent if the user has already checked in that day. Save required.</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="home-screen">HOME SCREEN</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-005</td>
+<td><strong>Home Screen Layout:</strong> Three zones: (1) Header — greeting "Hello [Name]", today's date (format: Weekday, DD Month), avatar (top right); (2) Hero — progress ring + hours display + shift info + CTA button; (3) Stats — 2 mini cards showing this month's on-time count and leave count, tap navigates to Report.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-006</td>
+<td><strong>Check In — Morning Shift:</strong> User taps Check In → selects Morning Shift (or default if no selection) → system records timestamp as check-in time → Check Out button appears → 8h NET goal timer starts. Check-in time is recorded in the Report card and Widget immediately. Cannot check in twice in the same day without checking out first.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-007</td>
+<td><strong>Check In — Afternoon Shift:</strong> User selects Afternoon Shift. If selected before 12:00 → Check In button is disabled; ring displays a countdown until 12:00. At 12:00, Check In becomes available. User taps Check In → system records timestamp → 4h NET goal timer starts. Lunch pause (12:00–13:00) does not apply if user checks in after 13:00.</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-008</td>
+<td><strong>Check In — Leave Day:</strong> User taps Leave Day → system records Full Day Leave for today in the Report. No check-out required. Progress ring is not shown. All remaining daily reminders for today are cancelled after Leave Day is recorded.</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-009</td>
+<td><strong>Progress Ring:</strong> SVG circle 140×140px. Displays NET hours worked as a percentage of the shift goal (8h Morning / 4h Afternoon). Fill = color-primary (green). Center display: "Xh Ym" (hours/minutes worked NET) with "of Xh goal" subtitle. Updates every minute. States: empty ring (0%) before check-in → grows as hours accumulate → ring stroke turns orange (color-warning) when &lt; 30 minutes remaining → ring turns full green when goal is reached → ring turns orange and freezes 12:00–13:00 with "Lunch Time" label.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-010</td>
+<td><strong>Lunch Break Auto-Pause (12:00–13:00):</strong> At exactly 12:00, the progress ring pauses and turns orange (color-warning). The label "Lunch Time" is displayed inside or below the ring. The NET hour count stops accumulating. At exactly 13:00, the ring resumes its previous color and continues counting. This 1-hour window is fixed and not configurable in Phase 1. Applies to Morning Shift only. NET calculation: if check-out is after 13:00, subtract 1h from GROSS to get NET.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-011</td>
+<td><strong>Check Out:</strong> Check Out button is available after check-in. Tapping Check Out records the check-out timestamp. System calculates: GROSS hours = check-out time − check-in time. NET hours = GROSS − 1h if check-out is after 13:00 and shift is Morning. Report and Widget updated with GROSS hours. If user attempts to check out with less than 4h NET (Morning) or 2h NET (Afternoon), a confirm dialog appears: "You have only worked Xh — confirm check out?"</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-012</td>
+<td><strong>Report Card on Home:</strong> After check-in, the Home screen displays a card showing: check-in time, current working status. After check-out: shows check-in time, check-out time, GROSS total hours. This card is always visible on Home once a check-in exists for the day.</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="widget">WIDGET</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-013</td>
+<td><strong>Home/Lock Screen Widget:</strong> Displays today's check-in time, check-out time (if checked out), and GROSS total hours. Widget reflects GROSS hours (check-out − check-in, lunch NOT deducted) consistent with Report. Updates in real-time after any check-in or check-out event.</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="reminder-system">REMINDER SYSTEM</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-014</td>
+<td><strong>Daily Check-In Reminder:</strong> At the time configured in Profile (FR-004), system sends push notification: "Have you checked in?" Fired every working day. Not sent if user has already checked in that day.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-015</td>
+<td><strong>1 Hour Remaining Reminder:</strong> When NET working hours reach (shift goal − 1h), system sends push notification: "1 hour remaining to complete your shift." Fires at 7h NET for Morning Shift, 3h NET for Afternoon Shift.</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-016</td>
+<td><strong>Shift Complete Reminder:</strong> When NET working hours reach the shift goal (8h or 4h), system sends push notification: "You've completed your shift — do you want to check out?"</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-017</td>
+<td><strong>18:00 Check-Out Prompt:</strong> If the user has checked in but not checked out by 18:00, system sends push notification at 18:00: "Do you want to check out?" Fires once regardless of shift type. Does not fire if already checked out or if Leave Day was selected.</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="report-screen">REPORT SCREEN</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-018</td>
+<td><strong>Monthly Calendar View:</strong> Displays a calendar grid (Mon–Sun, 7 columns) for the current attendance period (based on user-set cutoff date in FR-003). Each day cell shows a status dot (6px) below the date number. Navigation: month picker to move between periods; cannot navigate to a future period. Current day has a color-primary border.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-019</td>
+<td><strong>Day Status Logic:</strong> Each day is assigned one of four statuses based on recorded data for that day (all within the same calendar day — no overnight spanning): <strong>On-Time</strong> (green) = has both check-in AND check-out recorded; <strong>Incomplete</strong> (orange) = has check-in OR check-out, but not both; <strong>Missing</strong> (red) = no check-in AND no check-out AND not a Leave Day; <strong>Leave</strong> (blue) = marked as Full Day Leave via FR-008. Weekend days and public holidays: gray, not counted in summary.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>FR-020</td>
+<td><strong>Summary Card:</strong> Displayed at the top or bottom of the Report screen. Shows total count of each status for the current attendance period: On-Time count / Incomplete count / Missing count / Leave count. Tapping a status filters the calendar to show only days with that status. Total working days = calendar days in period excluding weekends.</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-021</td>
+<td><strong>Day Detail Panel:</strong> Tapping a day opens a bottom sheet showing: date, check-in time, check-out time, GROSS total hours, NET total hours, and day status. If no data: "No information for this day." If Leave Day: "Full Day Leave." Includes an Edit button (FR-022).</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-022</td>
+<td><strong>Edit Day Record:</strong> From the Day Detail panel, user can tap Edit to manually correct: check-in time, check-out time, or day status (On-Time / Incomplete / Missing / Leave). Edited records are marked as manually edited. System recalculates GROSS and NET after edit. Save required to persist changes.</td>
+<td>4</td>
+</tr>
+<tr>
+<td>FR-023</td>
+<td><strong>Import Data (CSV):</strong> User can import attendance data from a CSV file. Default format: columns = Date, Check-In, Check-Out, Status. System maps imported data to the Report calendar. Conflicts (existing data vs. imported data) prompt user to choose: keep existing or overwrite.</td>
+<td>3</td>
+</tr>
+<tr>
+<td>FR-024</td>
+<td><strong>Export Data:</strong> User can export attendance records for the current attendance period as a CSV file. Export includes: Date, Check-In, Check-Out, GROSS Hours, NET Hours, Status.</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-non-functional-requirements">8. NON-FUNCTIONAL REQUIREMENTS</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Category</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NF1</td>
+<td>Check-in and check-out actions must complete and confirm within 2 seconds on a 4G connection.</td>
+<td>Performance</td>
+</tr>
+<tr>
+<td>NF2</td>
+<td>Push notifications must be delivered within 30 seconds of the scheduled trigger time.</td>
+<td>Performance</td>
+</tr>
+<tr>
+<td>NF3</td>
+<td>Monthly calendar must load within 3 seconds on a 4G connection.</td>
+<td>Performance</td>
+</tr>
+<tr>
+<td>NF4</td>
+<td>Progress ring must update every 60 seconds minimum in real-time.</td>
+<td>Performance</td>
+</tr>
+<tr>
+<td>NF5</td>
+<td>Lunch break pause must be handled entirely client-side — no server call required to pause or resume. Ring must resume exactly at 13:00 even if the app is backgrounded.</td>
+<td>Performance</td>
+</tr>
+<tr>
+<td>NF6</td>
+<td>App must support iOS 14+ and Android 10+ (minimum 3 OS versions below the latest).</td>
+<td>Compatibility</td>
+</tr>
+<tr>
+<td>NF7</td>
+<td>All interactive elements must have a minimum touch target of 44×44px.</td>
+<td>Accessibility</td>
+</tr>
+<tr>
+<td>NF8</td>
+<td>Text color contrast must be ≥ 4.5:1 against all backgrounds (WCAG AA).</td>
+<td>Accessibility</td>
+</tr>
+<tr>
+<td>NF9</td>
+<td>App must support Dynamic Type / system font scaling. Minimum font size: 11px.</td>
+<td>Accessibility</td>
+</tr>
+<tr>
+<td>NF10</td>
+<td>Color must not be the sole status indicator — icon or text label must accompany all color-coded elements (dots, badges, ring states).</td>
+<td>Accessibility</td>
+</tr>
+<tr>
+<td>NF11</td>
+<td>All color values must use design token variables — no hardcoded hex values in source code.</td>
+<td>Maintainability</td>
+</tr>
+<tr>
+<td>NF12</td>
+<td>Dark mode must be supported. All color tokens must have dark-mode variants. Both modes must be tested before release.</td>
+<td>Usability</td>
+</tr>
+<tr>
+<td>NF13</td>
+<td>Attendance data must be persisted locally on the device to prevent data loss on crash or forced app close.</td>
+<td>Data Integrity</td>
+</tr>
+<tr>
+<td>NF14</td>
+<td>GROSS and NET hours must be calculated consistently everywhere: GROSS = check-out − check-in; NET = GROSS − 1h if check-out is after 13:00 and shift is Morning. No discrepancy between Home, Report, and Widget values.</td>
+<td>Data Integrity</td>
+</tr>
+<tr>
+<td>NF15</td>
+<td>Profile settings (avatar, name, attendance period, reminder time) must NOT be auto-saved — all changes require an explicit Save action to persist.</td>
+<td>Data Integrity</td>
+</tr>
+<tr>
+<td>NF16</td>
+<td>All main features must be reachable within 2 taps from the Home screen.</td>
+<td>Usability</td>
+</tr>
+<tr>
+<td>NF17</td>
+<td>Notification permission must be requested explicitly on first setup. Permission denial must be handled gracefully with a clear fallback message.</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>NF18</td>
+<td>Critical bugs (check-in failure, ring not updating, notification not firing) must be hotfixed within 24 hours.</td>
+<td>Maintainability</td>
+</tr>
+<tr>
+<td>NF19</td>
+<td>No gradient backgrounds. No hardcoded colors. Minimum font size 11px. Touch targets ≥ 44×44px throughout.</td>
+<td>Design Compliance</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-glossary">9. GLOSSARY</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Morning Shift</td>
+<td>Standard full-day attendance: 8h NET goal. Check-in available from app open. Subject to 12:00–13:00 lunch pause.</td>
+</tr>
+<tr>
+<td>Afternoon Shift</td>
+<td>Half-day attendance: 4h NET goal. Check-in button available only at/after 12:00. Lunch pause does not apply if check-in is after 13:00.</td>
+</tr>
+<tr>
+<td>Leave Day</td>
+<td>User marks the day as a full-day leave. No check-in/out required. Recorded in Report as "Leave." All day's reminders are cancelled.</td>
+</tr>
+<tr>
+<td>NET Hours</td>
+<td>Actual working time = GROSS − 1h lunch (if check-out after 13:00 on Morning Shift). Used for the progress ring and shift goal.</td>
+</tr>
+<tr>
+<td>GROSS Hours</td>
+<td>Total time from check-in to check-out including lunch. Used for Report, Widget, and Day Detail display.</td>
+</tr>
+<tr>
+<td>Progress Ring</td>
+<td>SVG circle 140×140px on the Home screen displaying % of NET hours worked vs. the shift goal. Pauses and turns orange during lunch (12:00–13:00).</td>
+</tr>
+<tr>
+<td>Lunch Time</td>
+<td>The fixed 12:00–13:00 window where the progress ring pauses, turns orange, and displays "Lunch Time." Not counted in NET hours.</td>
+</tr>
+<tr>
+<td>Attendance Period</td>
+<td>User-defined monthly reporting cycle based on a cutoff date. Example: cutoff = 26 → period = 26th prev month to 25th current month.</td>
+</tr>
+<tr>
+<td>On-Time</td>
+<td>Day status: both check-in AND check-out recorded for that day.</td>
+</tr>
+<tr>
+<td>Incomplete</td>
+<td>Day status: only check-in OR only check-out recorded — not both.</td>
+</tr>
+<tr>
+<td>Missing</td>
+<td>Day status: no check-in and no check-out, and no Leave Day marked.</td>
+</tr>
+<tr>
+<td>Widget</td>
+<td>Home screen or lock screen widget showing today's check-in time, check-out time, and GROSS hours.</td>
+</tr>
+<tr>
+<td>Design Token</td>
+<td>Named design values (colors, fonts, spacing) that are the single source of truth for the app's visual system.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-references">10. REFERENCES</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UI Annotation Document v1.0</td>
+<td>ChamCong/UI_Annotation_Document_v1.0.docx</td>
+</tr>
+<tr>
+<td>Design Token Document v1.0</td>
+<td>ChamCong/Design_Token_Document_v1.0.docx</td>
+</tr>
+<tr>
+<td>TimeApp Masterplan (local)</td>
+<td>ChamCong/TimeApp_masterplan.xlsx</td>
+</tr>
+<tr>
+<td>TimeApp GG Sheets</td>
+<td>https://docs.google.com/spreadsheets/d/1CJ0qKjeET9z7mDx8XEWbyj8f5JcgJMvnlEJ47VqvbLY</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-appendix">11. APPENDIX</h2>
+<p><strong>Screen summary:</strong></p>
+<p><strong>Home Screen</strong>
+- Header: "Hello [Name]", date, avatar
+- Hero: Progress ring (NET hours, 8h or 4h goal), Xh Ym center display, "of Xh goal" subtitle
+- Ring states: empty (before check-in) → fills green (checked in) → orange stroke (&lt; 30 min remaining) → orange + "Lunch Time" (12:00–13:00) → full green (goal complete)
+- CTA: Check In button → opens shift selection (Morning / Afternoon / Leave Day)
+- After check-in: Check Out button replaces Check In; report card shows check-in time
+- Stats: 2 mini cards — on-time count / leave count this month</p>
+<p><strong>Report Screen</strong>
+- Month picker (cannot navigate to future period)
+- Summary card: On-Time / Incomplete / Missing / Leave counts; tap to filter calendar
+- Calendar grid: Mon–Sun, color-coded dots (green/orange/red/blue/gray)
+- Day detail bottom sheet: check-in, check-out, GROSS, NET, status, Edit button
+- Import (CSV) and Export buttons</p>
+<p><strong>Profile &amp; Settings Screen</strong>
+- Avatar (default: app logo; changeable via photo library, crops to circle)
+- Name (editable text field)
+- Attendance Period (cutoff date picker)
+- Daily Check-In Reminder time picker (default 08:45)
+- Single Save button — all 4 settings persist only on Save</p>
+<p><strong>Reminder Schedule (per day):</strong>
+1. [User-configured time] → "Have you checked in?" (skipped if already checked in)
+2. [Check-in time + shift goal − 1h NET] → "1 hour remaining"
+3. [Check-in time + shift goal NET] → "You've completed your shift — check out?"
+4. [18:00] → "Do you want to check out?" (only if checked in, not yet checked out)</p>
+<p><strong>Hours calculation rule:</strong>
+- GROSS = check-out − check-in (always, including lunch)
+- NET = GROSS − 1h IF check-out is after 13:00 AND shift is Morning
+- NET = GROSS IF check-out is at or before 13:00 OR shift is Afternoon
+- Report, Widget, Day Detail always show GROSS
+- Progress ring and shift goal always use NET</p></body></html>

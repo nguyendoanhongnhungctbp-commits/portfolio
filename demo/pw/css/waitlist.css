@@ -1,0 +1,85 @@
+/* ============================================================
+   TRANG WAITLIST — bổ sung cho style.css (landing)
+   ------------------------------------------------------------
+   Đo từ ba bản thiết kế "PW — Landing Page (Optimized Flow…)" (export 2x,
+   khung 1284). Hero hai cột như bản landing gốc: 661 / 48 / 475, thẻ
+   Join the Waitlist rộng 475 ở cột phải.
+   ============================================================ */
+
+/* style.css đã căn giữa hero một cột (không còn thẻ mẫu); trang này quay về hai cột, căn trái */
+.hero-waitlist { padding: 58px 0 100px; }
+.hero-waitlist .wrap {
+  grid-template-columns: minmax(0, 661fr) minmax(0, 475fr);
+  justify-items: stretch; align-items: start; gap: 48px;
+}
+.hero-waitlist .wrap > div:first-child { max-width: none; text-align: left; }
+.hero-waitlist h1 { font-size: 3.2rem; text-wrap: wrap; }
+.hero-waitlist .hero-lead { font-size: .97rem; max-width: 47ch; margin: 0; }
+.hero-waitlist .hero-facts { margin: 34px 0 0; max-width: 512px; }
+.hero-waitlist .fact { padding: 13px 4px 13px 17px; }
+
+/* ---- Thẻ Join the Waitlist ---- */
+.wl-card {
+  position: relative; overflow: hidden;
+  padding: 32px; border: 1px solid var(--line); border-radius: 14px;
+  background:
+    radial-gradient(260px 220px at 100% 100%, rgba(77, 142, 255, .14), transparent 70%),
+    var(--card);
+}
+.wl-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.wl-tag {
+  display: inline-block; padding: 5px 12px; border-radius: 12px; background: var(--raise-hi);
+  font-family: var(--mono); font-size: .62rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--green);
+}
+.wl-state { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; color: var(--green); }
+.wl-state .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+.wl-card h2 { margin-top: 27px; font-family: var(--display); font-size: 1.62rem; font-weight: 600; line-height: 1.2; }
+.wl-lead { margin-top: 8px; font-size: .8rem; line-height: 1.45; color: var(--ink-2); max-width: 44ch; }
+
+.wl-label-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 21px; }
+.wl-label-row:first-child { margin-top: 20px; }
+.wl-label-row label { font-size: .78rem; font-weight: 500; color: var(--ink); }
+.wl-label-row label small { font-size: .75rem; font-weight: 400; color: var(--ink-2); }
+.wl-badge { display: inline-flex; align-items: center; gap: 5px; font-size: .74rem; color: #f3a99b; }
+.wl-badge svg { width: 14px; height: 14px; }
+
+.wl-input {
+  display: block; width: 100%; height: 42px; margin-top: 8px; padding: 0 15px;
+  border: 1px solid #151925; border-radius: 8px; background: #080b13; color: var(--ink);
+  font: inherit; font-size: .85rem;
+}
+.wl-input::placeholder { color: #7b8090; }
+.wl-input:focus { outline: 0; border-color: var(--blue); }
+.wl-input.has-error { border-color: #f3a99b; }
+.wl-error { display: flex; align-items: flex-start; gap: 8px; margin-top: 9px; font-size: .78rem; line-height: 1.35; color: #f3a99b; }
+.wl-error svg { flex: none; width: 17px; height: 17px; margin-top: 1px; }
+.wl-error-lines span { display: block; }
+
+.wl-submit { width: 100%; height: 42px; margin-top: 21px; font-size: .85rem; }
+.wl-submit svg { width: 17px; height: 17px; }
+.wl-secure {
+  display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 21px;
+  font-size: .72rem; color: var(--ink-2);
+}
+.wl-secure svg { width: 12px; height: 12px; color: #e7c97a; }
+
+/* ---- Trạng thái đã đăng ký ---- */
+.wl-card.is-done { padding-bottom: 29px; }
+.wl-done { margin-top: 48px; text-align: center; }
+.wl-done-mark {
+  display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto;
+  border: 1px solid #2b7a63; border-radius: 50%; background: #123d38; color: var(--green);
+}
+.wl-done-mark svg { width: 28px; height: 28px; stroke-width: 2.2; }
+.wl-done h2 { margin-top: 23px; font-size: 1.62rem; }
+.wl-done p { max-width: 36ch; margin: 12px auto 0; font-size: .83rem; line-height: 1.55; color: var(--ink-2); }
+.wl-explore { width: 100%; height: 47px; margin-top: 56px; border-color: var(--line); font-size: .82rem; }
+.wl-explore svg { width: 16px; height: 16px; }
+
+.title-card-foot .btn-quiet { text-decoration: none; }
+
+@media (max-width: 920px) {
+  .hero-waitlist .wrap { grid-template-columns: 1fr; gap: 36px; }
+  .wl-card { padding: 24px; }
+}
