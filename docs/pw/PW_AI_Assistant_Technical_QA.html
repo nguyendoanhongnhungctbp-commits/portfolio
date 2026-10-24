@@ -1,0 +1,215 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PW AI Assistant: technical Q&A</title><style>body{font:15px/1.65 system-ui,sans-serif;max-width:900px;margin:0 auto;padding:24px 16px;color:#10202b}table{border-collapse:collapse;display:block;overflow-x:auto;margin:12px 0}td,th{border:1px solid #dde3e8;padding:6px 10px;vertical-align:top;font-size:13.5px}th{background:#f3f6f4;text-align:left}code,pre{background:#f3f6f4;border-radius:4px;font-size:13px}pre{padding:10px;overflow-x:auto}h1,h2,h3{line-height:1.25}hr{border:0;border-top:1px solid #dde3e8}</style></head><body><h1>Câu hỏi kỹ thuật về AI Assistant mà người nghe có thể hỏi (và cách trả lời)</h1>
+<p>Bổ sung cho <code>PW_AI_Assistant_QA.md</code>. File này tập trung vào câu hỏi <strong>kỹ thuật</strong>: dữ liệu, vector, tìm kiếm, mô hình, bảo mật, vận hành.</p>
+<h2>0. Nguyên tắc khi trả lời câu hỏi kỹ thuật</h2>
+<ol>
+<li><strong>Trả lời theo ba tầng:</strong> (a) nó là gì, (b) em đề xuất dùng gì cho PW, (c) trong bản demo em làm gì. Tầng (c) luôn nói thật.</li>
+<li><strong>BA không phải kỹ sư triển khai.</strong> Em đề xuất và nêu tiêu chí chọn; nhóm kỹ thuật chốt sau khi thử. Câu an toàn khi không chắc: <em>"Phần này em đề xuất hướng và tiêu chí, con số cụ thể nhóm kỹ thuật cần đo sau khi thử nghiệm."</em></li>
+<li><strong>Không nêu con số chưa đo</strong> (độ chính xác, chi phí, mili-giây). Con số thời gian trong tài liệu này chỉ là cỡ thường gặp, không phải kết quả đo của PW.</li>
+<li><strong>Bản demo:</strong> tìm tài liệu bằng BM25 (từ khoá) trong trình duyệt, <strong>không có embedding và không có vector database</strong>, bước viết câu trả lời là giả lập. Nếu bị hỏi về bản demo, nói đúng như vậy.</li>
+</ol>
+<hr />
+<h2>1. Chuyển dữ liệu thành vector database</h2>
+<p><strong>Q1. Nếu em muốn chuyển dữ liệu (tài liệu) thành vector database thì em dùng chương trình gì?</strong>
+Quy trình có năm bước, mỗi bước một công cụ:
+1. <strong>Thu thập và làm sạch tài liệu:</strong> tài liệu viết bằng Markdown (hoặc lấy từ Notion, Confluence, Google Docs), bỏ phần thừa.
+2. <strong>Chia đoạn (chunking):</strong> cắt theo tiêu đề và mục, thường 300–800 từ vựng (token) mỗi đoạn, chồng lấn nhẹ khoảng 10–15% để không cắt đứt ý.
+3. <strong>Tạo vector (embedding):</strong> gọi một <strong>mô hình embedding</strong> qua API, ví dụ Voyage AI, OpenAI (text-embedding), Cohere (loại đa ngôn ngữ), hoặc mô hình mã nguồn mở như BGE-M3 hay multilingual-e5 chạy bằng thư viện sentence-transformers.
+4. <strong>Lưu vào cơ sở dữ liệu vector:</strong> em đề xuất <strong>PostgreSQL + pgvector</strong>; phương án khác là Pinecone (dịch vụ trọn gói), Qdrant, Weaviate, Chroma, Milvus.
+5. <strong>Chạy tự động:</strong> một script Python (hoặc Node) dùng SDK của nhà cung cấp, hoặc thư viện <strong>LangChain / LlamaIndex</strong> có sẵn bộ đọc tài liệu và bộ chia đoạn; chạy theo lịch hoặc khi có bản mới bằng cron, GitHub Actions hoặc Airflow.
+Trong sơ đồ D7.1 đây là các bước từ "làm sạch và chia đoạn" đến "lưu vector kèm metadata", rồi <strong>chạy bộ câu hỏi kiểm thử trước khi bật chỉ mục mới</strong>.</p>
+<p><strong>Q2. Vector (embedding) là gì? Giải thích đơn giản.</strong>
+Là dãy số biểu diễn <strong>ý nghĩa</strong> của một đoạn chữ. Hai đoạn có ý gần nhau thì vector gần nhau, nên tìm được "câu hỏi về giảm giá năm hai" dù từ ngữ không giống hệt tài liệu.</p>
+<p><strong>Q3. Vì sao chọn pgvector mà không phải Pinecone?</strong>
+Quy mô của PW nhỏ (hàng chục đến vài trăm tài liệu), PW cần một cơ sở dữ liệu quan hệ cho phần còn lại, nên dùng chung Postgres <strong>ít hệ thống hơn để vận hành</strong> và dễ kết hợp lọc theo quyền. Pinecone hợp khi cần mở rộng lớn và không muốn tự vận hành. Đây là đề xuất, nhóm kỹ thuật chốt.</p>
+<p><strong>Q4. Chia đoạn bao nhiêu là hợp lý? Sai thì sao?</strong>
+Đoạn quá ngắn thì mất ngữ cảnh, quá dài thì lẫn nhiều ý và tốn chi phí. Em đề xuất bắt đầu theo tiêu đề và mục, 300–800 token, rồi <strong>chỉnh bằng bộ câu hỏi kiểm thử</strong> (xem đoạn nào được tìm đúng). Con số chốt dựa trên thử nghiệm.</p>
+<p><strong>Q5. Metadata dùng để làm gì?</strong>
+Gắn cho mỗi đoạn: mã tài liệu, phiên bản, <strong>đối tượng được xem (public, member, admin)</strong>, ngôn ngữ, ngày. Dùng để lọc theo quyền ngay lúc tìm, dẫn nguồn trong câu trả lời, và xoá đoạn của bản cũ khi tài liệu đổi.</p>
+<p><strong>Q6. Khi tài liệu đổi thì xử lý thế nào? Có phải làm lại hết không?</strong>
+Chỉ nhúng lại các đoạn thuộc tài liệu đã đổi, rồi chạy bộ kiểm thử, đạt thì chuyển sang chỉ mục mới và xoá đoạn cũ; không đạt thì giữ chỉ mục cũ và báo người phụ trách. <strong>Nếu đổi mô hình embedding thì phải nhúng lại toàn bộ</strong>, vì vector của hai mô hình không so sánh được với nhau.</p>
+<p><strong>Q7. Dữ liệu động như điểm, hạng, NFT có đưa vào vector database không?</strong>
+Không. Đó là dữ liệu có cấu trúc, đổi từng phút và cần đúng tuyệt đối; tìm theo "gần nghĩa" dễ sai số hoặc sai tên, và phải lập chỉ mục lại mỗi giao dịch. Chúng đọc qua <strong>hàm truy vấn chỉ đọc</strong> trên cơ sở dữ liệu của PW.</p>
+<p><strong>Q8. Dữ liệu trên blockchain thì AI lấy thế nào?</strong>
+Qua cơ sở dữ liệu của PW (đã đồng bộ), hoặc hỏi trực tiếp blockchain thông qua nhà cung cấp node như Alchemy (có API tra NFT và chủ sở hữu). Cả hai đều là hàm đọc, không phải nội dung đưa vào kho tài liệu.</p>
+<p><strong>Q9. Có thể dùng luôn công cụ "Claude Projects" hay "Custom GPT" thay vì tự dựng không?</strong>
+Dùng được để <strong>thử ý tưởng nhanh</strong>. Không dùng cho sản phẩm vì không kiểm soát được quyền dữ liệu theo từng người dùng, nhật ký, đo chất lượng, và việc nối với dữ liệu sống của PW.</p>
+<p><strong>Q10. Tài liệu hiện có 19 mục, tại sao còn cần vector database?</strong>
+Thật ra với cỡ này có thể <strong>đưa toàn bộ tài liệu vào lời nhắc hệ thống</strong> (kèm bộ nhớ đệm lời nhắc), chưa cần vector. Em thiết kế sẵn luồng D7.1 vì khi kho tài liệu lớn lên (BRD, SRS, chính sách theo thẩm quyền, nhiều ngôn ngữ) cách đó không đủ. Lộ trình: giai đoạn 1 dùng lời nhắc, giai đoạn 2 chuyển sang tìm lai.</p>
+<hr />
+<h2>2. Tìm kiếm và xếp hạng kết quả</h2>
+<p><strong>Q11. Tìm kiếm trong demo hoạt động thế nào?</strong>
+BM25: thuật toán xếp hạng theo <strong>từ khoá</strong> (từ nào hiếm và xuất hiện nhiều trong đoạn thì điểm cao). Chạy trong trình duyệt, có bảng từ đồng nghĩa nhỏ và ngưỡng điểm, và chỉ trả lời khi độ phủ từ khoá đủ. Bản thật dùng embedding.</p>
+<p><strong>Q12. Tìm lai (hybrid search) là gì và vì sao cần?</strong>
+Kết hợp <strong>vector</strong> (hiểu nghĩa) với <strong>từ khoá</strong> (khớp chính xác). Mã như <code>#PW-2026-INV-10233</code> hay <code>PW-ORG-0081</code> và tên pháp nhân là chuỗi chính xác, embedding thuần thường trượt. Hai danh sách kết quả được gộp bằng kỹ thuật như <strong>Reciprocal Rank Fusion</strong>.</p>
+<p><strong>Q13. Độ giống giữa hai vector đo bằng gì?</strong>
+Thường là <strong>độ tương đồng cosine</strong> (góc giữa hai vector). Cơ sở dữ liệu vector dùng chỉ mục xấp xỉ (như <strong>HNSW</strong>, pgvector có hỗ trợ) để tìm nhanh trong nhiều vector mà không phải so từng cái.</p>
+<p><strong>Q14. Lấy bao nhiêu đoạn đưa vào mô hình (top-k)?</strong>
+Em đề xuất lấy khoảng 10 đoạn rồi <strong>xếp hạng lại (rerank)</strong> còn 3–5 đoạn tốt nhất. Ít quá thì thiếu ý, nhiều quá thì nhiễu và tốn chi phí. Con số chốt qua thử nghiệm.</p>
+<p><strong>Q15. Reranker là gì?</strong>
+Một mô hình thứ hai chấm lại mức liên quan giữa câu hỏi và từng đoạn tìm được, chính xác hơn bước tìm nhanh. Ví dụ Cohere Rerank, Voyage rerank, hoặc mô hình mã nguồn mở bge-reranker.</p>
+<p><strong>Q16. Làm sao bảo đảm người dùng thường không đọc được tài liệu dành cho admin?</strong>
+<strong>Lọc theo quyền ngay lúc tìm</strong> bằng metadata (public, member, admin). Lọc sau khi mô hình đã nhận đoạn là quá muộn.</p>
+<p><strong>Q17. Nếu không tìm được đoạn nào đủ liên quan?</strong>
+Nếu đã có số liệu sống thì vẫn trả lời bằng số liệu đó. Nếu cả hai nguồn đều trống thì trả lời rõ là không có thông tin, <strong>không đoán</strong>.</p>
+<hr />
+<h2>3. Mô hình ngôn ngữ và lời nhắc (prompt)</h2>
+<p><strong>Q18. Em chọn mô hình nào và dựa trên tiêu chí gì?</strong>
+Đề xuất Claude cho phần viết câu trả lời (mô hình cỡ vừa) và một mô hình cỡ nhỏ cho phân loại câu hỏi. Tiêu chí: bám sát tài liệu, tiếng Việt, độ trễ, chính sách dữ liệu, giá. Phương án khác GPT, Gemini. Nhóm kỹ thuật so sánh bằng chính bộ câu hỏi kiểm thử của PW.</p>
+<p><strong>Q19. Lời nhắc gồm những gì?</strong>
+Bốn phần: (1) quy tắc của trợ lý (chỉ dựa vào dữ liệu được đưa vào, không tư vấn đầu tư, dẫn nguồn); (2) số liệu sống của người hỏi và của nền tảng; (3) các đoạn tài liệu kèm mã nguồn; (4) câu hỏi. Demo có nút "How this was answered" cho xem đúng lời nhắc này.</p>
+<p><strong>Q20. Tool use / function calling là gì?</strong>
+Cho mô hình biết có những <strong>hàm</strong> nào (ví dụ lấy điểm, lấy danh sách NFT của tôi). Khi cần, mô hình yêu cầu gọi hàm, <strong>máy chủ</strong> chạy hàm theo quyền người dùng và trả kết quả lại cho mô hình viết câu trả lời. Mô hình không tự truy cập cơ sở dữ liệu.</p>
+<p><strong>Q21. Tại sao không đưa cả cơ sở dữ liệu cho mô hình, hoặc để mô hình tự viết câu SQL?</strong>
+Rủi ro lộ dữ liệu người khác và câu lệnh sai hoặc nguy hiểm, và tốn chi phí khi dữ liệu lớn. Dùng các hàm chỉ đọc đã định sẵn, có kiểm quyền, an toàn hơn.</p>
+<p><strong>Q22. Cửa sổ ngữ cảnh (context window) là gì và vì sao không nhét hết tài liệu?</strong>
+Là lượng chữ tối đa mô hình nhận trong một lần. Nhét hết thì tốn chi phí và chậm, mô hình dễ bỏ sót ý ở giữa. Với 19 tài liệu hiện nay thì nhét được; khi kho lớn thì phải tìm và chỉ đưa đoạn liên quan.</p>
+<p><strong>Q23. Bộ nhớ đệm lời nhắc (prompt caching) để làm gì?</strong>
+Phần lời nhắc cố định (quy tắc, tài liệu) được lưu lại để lần gọi sau rẻ và nhanh hơn. Hợp với giai đoạn 1 khi đưa toàn bộ tài liệu vào lời nhắc.</p>
+<p><strong>Q24. Fine-tune khác RAG thế nào?</strong>
+Fine-tune thay đổi bản thân mô hình, tốn công và <strong>khó cập nhật khi quy tắc đổi</strong>, không có nguồn để kiểm. RAG đổi tài liệu là cập nhật ngay và có dẫn nguồn. PW có quy tắc đổi thường xuyên nên dùng RAG.</p>
+<p><strong>Q25. Làm sao đo "không bịa" (hallucination)?</strong>
+Đo hai thứ: câu trả lời có <strong>bám vào nguồn được đưa vào</strong> không (groundedness/faithfulness), và có đúng số liệu không. Em dùng bộ câu hỏi kiểm thử có đáp án mong đợi, kể cả loại câu "phải từ chối" và "phải nói không có dữ liệu". Công cụ đo như Ragas, Promptfoo, TruLens khi có bản thật.</p>
+<p><strong>Q26. Ngôn ngữ: người dùng hỏi tiếng Việt thì sao?</strong>
+Demo chỉ hiểu tiếng Anh. Bản thật cần mô hình ngôn ngữ và mô hình embedding <strong>đa ngôn ngữ</strong>, và tài liệu nên có bản tiếng Việt hoặc chấp nhận tìm xuyên ngôn ngữ. Cần chốt sớm vì đổi mô hình embedding phải nhúng lại toàn bộ.</p>
+<hr />
+<h2>4. Tích hợp và bảo mật</h2>
+<p><strong>Q27. Khoá API để ở đâu?</strong>
+Chỉ ở <strong>máy chủ trung gian</strong> (hàm serverless như Vercel, Cloudflare Workers, AWS Lambda). Không bao giờ ở trình duyệt. Trình duyệt chỉ gọi một điểm cuối của PW với câu hỏi.</p>
+<p><strong>Q28. Máy chủ biết ai đang hỏi bằng cách nào?</strong>
+Từ <strong>phiên đăng nhập</strong> trên máy chủ (mã người dùng và vai trò). Không tin mã người dùng do trình duyệt gửi lên, vì có thể bị giả mạo.</p>
+<p><strong>Q29. Prompt injection là gì và PW phòng thế nào?</strong>
+Là việc người dùng (hoặc nội dung tài liệu) chèn câu lệnh để mô hình làm sai ("bỏ qua mọi quy tắc…"). Phòng: coi mọi chữ người dùng nhập và nội dung tài liệu là <strong>dữ liệu, không phải lệnh</strong>; kiểm tra đầu vào bằng quy tắc và một mô hình nhỏ; kiểm tra câu trả lời (có nguồn, không lộ dữ liệu người khác); mô hình <strong>không được quyền ghi dữ liệu</strong>. Bản demo chỉ chặn bằng quy tắc nên dễ bị lách; em nói rõ điều này.</p>
+<p><strong>Q30. Dữ liệu cá nhân gửi cho nhà cung cấp mô hình có an toàn không?</strong>
+Chỉ gửi phần cần thiết (số liệu của chính người hỏi), che thông tin nhạy cảm trong nhật ký, chọn nhà cung cấp có cam kết <strong>không dùng dữ liệu để huấn luyện</strong> và lưu trữ tối thiểu, và để Compliance rà soát hợp đồng. KYC (giấy tờ) <strong>không bao giờ</strong> đưa vào trợ lý.</p>
+<p><strong>Q31. AI có thể thực hiện giao dịch không?</strong>
+Không. Theo BRD trợ lý chỉ đọc. Giao dịch luôn do người dùng tự xác nhận. (Prototype có phần điền sẵn đơn mua, người dùng vẫn tự bấm thanh toán; phần này ngoài BRD.)</p>
+<p><strong>Q32. Chống lạm dụng thế nào (spam, tốn chi phí)?</strong>
+Giới hạn số câu hỏi mỗi người, giới hạn độ dài câu hỏi, yêu cầu đăng nhập cho tính năng dùng dữ liệu cá nhân, và theo dõi chi phí theo người dùng.</p>
+<p><strong>Q33. Prompt injection qua tài liệu thì sao (tài liệu bị chèn lệnh)?</strong>
+Tài liệu đi qua bước <strong>duyệt</strong> trước khi nạp (D7.1), lời nhắc dặn mô hình chỉ coi đoạn tài liệu là dữ liệu tham khảo, và đoạn chỉ có đối tượng xem đúng quyền mới được tìm thấy.</p>
+<p><strong>Q34. Còn ghi nhật ký thì sao? Có vi phạm quyền riêng tư không?</strong>
+Ghi câu hỏi, đoạn tìm được, câu trả lời, độ trễ để rà soát và cải thiện, <strong>che dữ liệu nhạy cảm</strong>, có thời hạn lưu và chỉ vai trò được phép mới xem được. Công cụ như Langfuse hoặc LangSmith.</p>
+<hr />
+<h2>5. Vận hành, hiệu năng, đo lường</h2>
+<p><strong>Q35. Thời gian phản hồi 2–5 giây phân bổ ra sao?</strong>
+Cỡ thường gặp: embedding câu hỏi và tìm kiếm vài chục đến vài trăm mili-giây, xếp hạng lại thêm một chút, <strong>phần lớn thời gian là mô hình ngôn ngữ</strong>. Cách giữ trong 2–5 giây: truyền dần câu trả lời (người dùng thấy chữ đầu tiên rất sớm), dùng mô hình vừa đủ, ít đoạn nhưng đúng, bộ nhớ đệm lời nhắc. Đây là yêu cầu em cần <strong>đo thật</strong> khi có bản chạy mô hình.</p>
+<p><strong>Q36. Nếu nhà cung cấp mô hình bị lỗi hoặc quá tải?</strong>
+Hạ cấp có kiểm soát: hiện thông báo "trợ lý tạm thời không phản hồi", kèm đường dẫn tới trang hướng dẫn và liên hệ hỗ trợ; thử lại có giới hạn; không làm ảnh hưởng các chức năng chính (mua, xác minh). Yêu cầu khả dụng nền tảng là 99,5% mỗi tháng (NFR-007).</p>
+<p><strong>Q37. Chịu tải bao nhiêu người cùng lúc?</strong>
+Yêu cầu của BRD: 200 người dùng đồng thời trong năm đầu (NFR-006). Hàm serverless co giãn theo số yêu cầu; điểm nghẽn cần kiểm là hạn mức gọi của nhà cung cấp mô hình.</p>
+<p><strong>Q38. Đo chất lượng liên tục bằng cách nào?</strong>
+Bộ câu hỏi kiểm thử <strong>chạy mỗi khi đổi tài liệu, lời nhắc hoặc mô hình</strong>; mỗi lỗi gặp thêm một câu vào bộ. Chỉ số: tỷ lệ tìm đúng đoạn (recall@k), bám nguồn, từ chối đúng, độ trễ. Câu quan trọng có người chấm. Demo hiện có 33 câu, đạt hết.</p>
+<p><strong>Q39. Ai sở hữu nội dung tài liệu và ai duyệt?</strong>
+Một người phụ trách nội dung (đề xuất Product Owner phối hợp Compliance). Tài liệu viết trong kho Git, duyệt bằng pull request, nạp tự động theo D7.1, kiểm thử trước khi bật.</p>
+<p><strong>Q40. Phiên bản chỉ mục là gì và vì sao cần?</strong>
+Mỗi lần nạp tạo một bản chỉ mục mới; chỉ chuyển sang bản mới khi bộ kiểm thử đạt, nên không bao giờ trả lời bằng chỉ mục hỏng hoặc lai giữa hai phiên bản.</p>
+<hr />
+<h2>6. Lựa chọn kiến trúc (câu hỏi "tại sao không…")</h2>
+<p><strong>Q41. Tại sao không dùng mô hình mã nguồn mở chạy trên máy của PW?</strong>
+Có thể, nếu yêu cầu dữ liệu không được rời hệ thống. Đổi lại phải tự vận hành máy chủ có GPU, theo dõi và cập nhật mô hình, và chất lượng tiếng Việt cần kiểm. Em đề xuất bắt đầu bằng dịch vụ API, để mở đường chuyển sau nếu Compliance yêu cầu.</p>
+<p><strong>Q42. Tại sao không dùng LangChain cho toàn bộ?</strong>
+Quy trình chỉ vài bước (kiểm tra, tìm, ghép lời nhắc, gọi mô hình, kiểm tra), gọi trực tiếp SDK ít mã và ít phụ thuộc hơn. LangChain hoặc LlamaIndex hữu ích cho <strong>phần nạp tài liệu</strong> (bộ đọc, bộ chia đoạn) hơn là cho phần trả lời.</p>
+<p><strong>Q43. Có cần "agent" (AI tự lập kế hoạch nhiều bước) không?</strong>
+Chưa. Trợ lý chỉ cần quy trình cố định: kiểm tra, gọi hàm đọc, tìm tài liệu, trả lời. Agent khó kiểm soát và khó đo; chỉ cân nhắc khi có nhu cầu nhiều bước thật sự.</p>
+<p><strong>Q44. Tại sao chia hai sơ đồ D7.1 và D7.2?</strong>
+Hai việc khác nhau về thời điểm và người chịu trách nhiệm: nạp tri thức (khi tài liệu đổi, do người phụ trách nội dung) và trả lời (mỗi câu hỏi, tự động). Tách ra để kiểm thử và phân quyền rõ ràng.</p>
+<p><strong>Q45. Khi cần mở rộng thêm nhiều loại dữ liệu (PDF, bảng) thì sao?</strong>
+Thêm bước đọc và làm sạch cho từng loại ở D7.1; phần trả lời không đổi. PDF dạng ảnh cần nhận dạng chữ (OCR) trước. Bảng và số liệu có cấu trúc nên đi qua hàm truy vấn thay vì đưa vào vector.</p>
+<p><strong>Q46. Em đã thử nghiệm những gì, chưa làm những gì?</strong>
+Đã làm: demo chạy trong trình duyệt với tìm kiếm BM25, quy tắc chặn, hàm đọc số liệu sống, bộ 33 câu kiểm thử, bảng "How this was answered". Chưa làm: embedding và vector database thật, gọi mô hình ngôn ngữ thật, máy chủ trung gian, đo độ trễ và chi phí. Em ghi rõ ranh giới này trong tài liệu thiết kế.</p>
+<hr />
+<h2>7. Bảng thuật ngữ nhanh (đọc lại trước khi trình bày)</h2>
+<table>
+<thead>
+<tr>
+<th>Thuật ngữ</th>
+<th>Một câu giải thích</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAG</td>
+<td>Tìm đoạn tài liệu liên quan rồi đưa vào lời nhắc để mô hình trả lời dựa trên đó</td>
+</tr>
+<tr>
+<td>Chunk</td>
+<td>Một đoạn tài liệu sau khi chia nhỏ</td>
+</tr>
+<tr>
+<td>Embedding</td>
+<td>Dãy số biểu diễn ý nghĩa của một đoạn chữ</td>
+</tr>
+<tr>
+<td>Vector database</td>
+<td>Cơ sở dữ liệu lưu vector và tìm các vector gần nhau</td>
+</tr>
+<tr>
+<td>Cosine similarity</td>
+<td>Cách đo hai vector gần nhau (góc giữa chúng)</td>
+</tr>
+<tr>
+<td>HNSW</td>
+<td>Kiểu chỉ mục tìm gần đúng nhanh trong nhiều vector</td>
+</tr>
+<tr>
+<td>BM25</td>
+<td>Thuật toán xếp hạng theo từ khoá</td>
+</tr>
+<tr>
+<td>Hybrid search</td>
+<td>Kết hợp vector và từ khoá</td>
+</tr>
+<tr>
+<td>Rerank</td>
+<td>Chấm lại mức liên quan của các đoạn đã tìm được</td>
+</tr>
+<tr>
+<td>Top-k</td>
+<td>Số đoạn tốt nhất được lấy</td>
+</tr>
+<tr>
+<td>Token</td>
+<td>Đơn vị chữ mô hình đếm (khoảng một từ ngắn hoặc một phần từ)</td>
+</tr>
+<tr>
+<td>Context window</td>
+<td>Lượng chữ tối đa mô hình nhận trong một lần</td>
+</tr>
+<tr>
+<td>Prompt</td>
+<td>Toàn bộ chữ gửi cho mô hình (quy tắc, dữ liệu, câu hỏi)</td>
+</tr>
+<tr>
+<td>Function calling / Tool use</td>
+<td>Mô hình yêu cầu chạy một hàm, máy chủ chạy rồi trả kết quả</td>
+</tr>
+<tr>
+<td>Hallucination</td>
+<td>Mô hình bịa thông tin không có trong nguồn</td>
+</tr>
+<tr>
+<td>Grounding</td>
+<td>Buộc câu trả lời dựa trên nguồn được đưa vào</td>
+</tr>
+<tr>
+<td>Prompt injection</td>
+<td>Chèn lệnh để làm mô hình làm sai quy tắc</td>
+</tr>
+<tr>
+<td>Prompt caching</td>
+<td>Lưu phần lời nhắc cố định để lần sau rẻ và nhanh hơn</td>
+</tr>
+<tr>
+<td>Streaming</td>
+<td>Gửi câu trả lời từng phần để người dùng thấy chữ ngay</td>
+</tr>
+<tr>
+<td>Fine-tuning</td>
+<td>Huấn luyện thêm bản thân mô hình, khó cập nhật khi quy tắc đổi</td>
+</tr>
+<tr>
+<td>Guardrails</td>
+<td>Lớp kiểm tra chặn câu hỏi hoặc câu trả lời không phù hợp</td>
+</tr>
+</tbody>
+</table></body></html>
