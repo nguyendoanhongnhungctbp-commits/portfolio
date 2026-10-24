@@ -117,7 +117,7 @@
       <li>v2: login removed, because it is a personal tool that runs on the device with no server</li>
       <li>Added morning shift (8 hours), afternoon shift (4 hours), leave day, attendance period by cutoff date, CSV import/export and per-day record editing</li>
       <li>Out of scope for phase 1: leave approval, payroll integration, biometric/GPS, team reports, multi-device sync</li>
-      <li>Estimated 3 months: design 1, development 1.5, testing 0.5; team of 6 (PM, BA, 2 mobile, BE, tester, UI/UX)</li></ul><p class="doclinks"><a href="docs/time/TimeApp_BRD_v2.pdf#page=1" target="_blank" rel="noopener">BRD v2 · scope ↗</a><a href="https://docs.google.com/spreadsheets/d/1CJ0qKjeET9z7mDx8XEWbyj8f5JcgJMvnlEJ47VqvbLY" target="_blank" rel="noopener">User stories &amp; master plan (Sheets) ↗</a><a href="docs/time/TimeApp_User_Stories_AC.pdf" target="_blank" rel="noopener">User stories &amp; AC ↗</a></p></details>
+      <li>Estimated 3 months: design 1, development 1.5, testing 0.5; team of 6 (PM, BA, 2 mobile, BE, tester, UI/UX)</li></ul><p class="doclinks"><a href="docs/time/TimeApp_BRD_v2.pdf#page=1" target="_blank" rel="noopener">BRD ↗</a><a href="docs/time/TimeApp_User_Stories_AC.pdf" target="_blank" rel="noopener">User stories &amp; AC ↗</a></p></details>
     <details><summary>Business flow</summary><ol>
       <li>Daily reminder at the configured time (default 08:45), skipped if already checked in</li>
       <li>Choose shift: morning, afternoon or leave</li>
@@ -125,7 +125,7 @@
       <li>Afternoon: before 12:00 check-in is disabled with a countdown; from 12:00 it counts 4 net hours</li>
       <li>Leave: records the full day and cancels all reminders for the day</li>
       <li>At 18:00, one reminder if checked in but not checked out</li>
-      <li>Check-out: calculates gross and net hours and updates the day status</li></ol><p class="doclinks"><a href="docs/time/TimeApp_BPMN.pdf" target="_blank" rel="noopener">BPMN diagram ↗</a><a href="docs/time/TimeApp_BRD_v2.pdf#page=2" target="_blank" rel="noopener">BRD v2 · proposed process ↗</a><a href="docs/time/TimeApp_BPMN_interactive.pdf" target="_blank" rel="noopener">Daily-flow BPMN ↗</a></p></details>
+      <li>Check-out: calculates gross and net hours and updates the day status</li></ol><p class="doclinks"><a href="docs/time/TimeApp_BPMN.pdf" target="_blank" rel="noopener">BPMN diagram ↗</a><a href="docs/time/TimeApp_BPMN_interactive.pdf" target="_blank" rel="noopener">Daily-flow BPMN ↗</a></p></details>
     <details><summary>Business rules</summary><ul>
       <li>Gross hours = check-out minus check-in, used in report, widget and day detail</li>
       <li>Net hours = gross minus 1 hour if check-out is after 13:00 on morning shift, used for the progress ring and shift goal</li>
@@ -133,11 +133,11 @@
       <li>4 day statuses: on-time (both in and out), incomplete (one missing), missing (none), leave; weekends and holidays are not counted</li>
       <li>Attendance period by cutoff day 1–28, for example cutoff 26 runs from the 26th of last month to the 25th of this month</li>
       <li>4 reminders: start of day, 1 hour left, shift complete, 18:00; checking out under 4 hours on morning shift needs confirmation</li>
-      <li>Profile settings save only when Save is tapped, never automatically</li></ul><p class="doclinks"><a href="docs/time/TimeApp_BRD_v2.pdf#page=8" target="_blank" rel="noopener">BRD v2 · hours rules (appendix) ↗</a></p></details>
+      <li>Profile settings save only when Save is tapped, never automatically</li></ul></details>
     <details><summary>Requirements</summary><ul>
       <li>Functional by group: profile and settings 4, home screen 8, widget 1, reminders 4, report 7</li>
       <li>Report: monthly calendar with colored dots, summary card that filters by status, day detail, record editing, CSV import with conflict handling, CSV export</li>
-      <li>Non-functional: performance (check-in under 2 seconds, notifications within 30 seconds), iOS 14+ and Android 10+, accessibility (WCAG AA, 44px touch targets, never color alone), dark mode, local data storage, notification permission, critical bug fix within 24 hours</li></ul><p class="doclinks"><a href="docs/time/TimeApp_BRD_v2.pdf#page=3" target="_blank" rel="noopener">BRD v2 · functional ↗</a><a href="docs/time/TimeApp_BRD_v2.pdf#page=6" target="_blank" rel="noopener">BRD v2 · non-functional ↗</a></p></details>
+      <li>Non-functional: performance (check-in under 2 seconds, notifications within 30 seconds), iOS 14+ and Android 10+, accessibility (WCAG AA, 44px touch targets, never color alone), dark mode, local data storage, notification permission, critical bug fix within 24 hours</li></ul></details>
     <details><summary>Product and design</summary><ul>
       <li>iPhone app in SwiftUI: home, report, profile and splash screens</li>
       <li>Interactive web prototype of the app (check-in, lunch pause, reminders, report calendar, profile) built from the Home spec and BRD v2, with a simulated clock</li>
