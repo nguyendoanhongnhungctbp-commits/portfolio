@@ -125,7 +125,7 @@
       <li>Afternoon: before 12:00 check-in is disabled with a countdown; from 12:00 it counts 4 net hours</li>
       <li>Leave: records the full day and cancels all reminders for the day</li>
       <li>At 18:00, one reminder if checked in but not checked out</li>
-      <li>Check-out: calculates gross and net hours and updates the day status</li></ol><p class="doclinks"><a href="docs/time/TimeApp_BPMN.pdf" target="_blank" rel="noopener">BPMN diagram ↗</a><a href="docs/time/TimeApp_BPMN_interactive.pdf" target="_blank" rel="noopener">Daily-flow BPMN ↗</a></p></details>
+      <li>Check-out: calculates gross and net hours and updates the day status</li></ol><p class="doclinks"><a href="docs/time/TimeApp_BPMN.pdf" target="_blank" rel="noopener">BPMN diagram ↗</a></p></details>
     <details><summary>Business rules</summary><ul>
       <li>Gross hours = check-out minus check-in, used in report, widget and day detail</li>
       <li>Net hours = gross minus 1 hour if check-out is after 13:00 on morning shift, used for the progress ring and shift goal</li>
@@ -165,7 +165,7 @@
   <dl class="facts">
     <div><dt>Problem</dt><dd>One dispatcher handles every order of the day from personal experience, with no process for exceptions.</dd></div>
     <div><dt>Solution</dt><dd>Chooses direct or Hub delivery, matches drivers in real time, driver eKYC, customers track their orders.</dd></div>
-    <div><dt>Role</dt><dd>BA in the team: business context, current process, slides; helped finish the SRS handed to UI/UX.</dd></div>
+    <div><dt>Role</dt><dd>BA in the team: business context and current process; helped finish the SRS handed to UI/UX.</dd></div>
   </dl>
 
   <ul class="tags"><li>SRS</li><li>BPMN</li><li>Use Case</li><li>Activity Diagram</li><li>Data model</li><li>FR/NFR</li></ul>
@@ -180,7 +180,7 @@
     <details><summary>Documents</summary><ul>
       <li>SRS with 18 business rules, 20 use cases and 40 functional requirements</li>
       <li>Current and proposed business process, use case and activity diagrams, data types</li>
-      <li>Screen mapping, master plan, defense slides</li></ul><p class="doclinks"><a href="docs/logistics/SLDS_Business_Process_Current.pdf" target="_blank" rel="noopener">Current process ↗</a><a href="docs/logistics/SLDS_Business_Process_Proposed.pdf" target="_blank" rel="noopener">Proposed process ↗</a><a href="docs/logistics/SLDS_Activity_Diagram.pdf" target="_blank" rel="noopener">Activity diagram ↗</a><a href="docs/logistics/SLDS_Data_Types.pdf" target="_blank" rel="noopener">Data types ↗</a><a href="docs/logistics/SLDS_FR_NFR.pdf" target="_blank" rel="noopener">FR &amp; NFR ↗</a><a href="docs/logistics/SLDS_Master_Plan.pdf" target="_blank" rel="noopener">Master plan ↗</a><a href="docs/logistics/SLDS_Slides.pdf" target="_blank" rel="noopener">Slides ↗</a><a href="https://face-id-scan-verify.lovable.app/" target="_blank" rel="noopener">Prototype ↗</a></p></details>
+      <li>Screen mapping and master plan</li></ul><p class="doclinks"><a href="docs/logistics/SLDS_Business_Process_Current.pdf" target="_blank" rel="noopener">Current process ↗</a><a href="docs/logistics/SLDS_Business_Process_Proposed.pdf" target="_blank" rel="noopener">Proposed process ↗</a><a href="docs/logistics/SLDS_Activity_Diagram.pdf" target="_blank" rel="noopener">Activity diagram ↗</a><a href="docs/logistics/SLDS_Data_Types.pdf" target="_blank" rel="noopener">Data types ↗</a><a href="docs/logistics/SLDS_FR_NFR.pdf" target="_blank" rel="noopener">FR &amp; NFR ↗</a><a href="docs/logistics/SLDS_Master_Plan.pdf" target="_blank" rel="noopener">Master plan ↗</a><a href="https://face-id-scan-verify.lovable.app/" target="_blank" rel="noopener">Prototype ↗</a></p></details>
     <details><summary>Design decisions</summary><ul>
       <li>Every AI suggestion has a non-AI fallback so order handling never stops</li>
       <li>Driver identity verified by eKYC before taking orders</li>
@@ -214,7 +214,7 @@
   <div class="more">
     <details><summary>Requirements</summary><ul>
       <li>31 user stories in 5 epics: account, products, ordering and payment, menu suggestion, AI chatbox</li>
-      <li>29 functional requirements with priorities; 22 non-functional (performance, security, PCI-DSS, WCAG)</li></ul><p class="doclinks"><a href="https://drive.google.com/file/d/1X_LprOxxig6z9ANkVWEJ7axU12PDx2Hz/view?usp=sharing" target="_blank" rel="noopener">FDD ↗</a></p></details>
+      <li>29 functional requirements with priorities; 22 non-functional (performance, security, PCI-DSS, WCAG)</li></ul><p class="doclinks"><a href="https://drive.google.com/file/d/1X_LprOxxig6z9ANkVWEJ7axU12PDx2Hz/view?usp=sharing" target="_blank" rel="noopener">FDD ↗</a><a href="docs/grocery/SmartGrocery_Survey.pdf" target="_blank" rel="noopener">Survey results ↗</a></p></details>
     <details><summary>Business case</summary><ul>
       <li>5 business drivers: clear market demand, solving "what to eat today", higher average order value, AI as a differentiator, lower operating cost</li>
       <li>In scope: account, products and promotions, ordering and payment, menu suggestion, AI chatbox</li>
@@ -226,7 +226,7 @@
     <details><summary>Planning</summary><ul>
       <li>WBS with man-day estimates by role, 12-week Gantt</li>
       <li>Team: PM, BA, front-end, 2 back-end, 2 Flutter, tester, UI/UX</li>
-      <li>Planned team of 9, 6 months</li></ul><p class="doclinks"><a href="docs/grocery/SmartGrocery_Master_Plan.pdf" target="_blank" rel="noopener">Master plan workbook ↗</a></p></details>
+      <li>Planned team of 9, 6 months</li></ul><p class="doclinks"><a href="docs/grocery/SmartGrocery_Master_Plan.pdf" target="_blank" rel="noopener">Master plan ↗</a></p></details>
   </div>
 
 </article>
