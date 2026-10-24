@@ -96,7 +96,7 @@
     <dl class="kpis">
       <div><dt>functional requirements</dt><dd>24</dd></div>
       <div><dt>non-functional requirements</dt><dd>19</dd></div>
-      <div><dt>user stories</dt><dd>17</dd></div>
+      <div><dt>daily reminders</dt><dd>4</dd></div>
       <div><dt>working builds</dt><dd>3</dd></div>
     </dl>
   </div>
@@ -104,20 +104,20 @@
   <dl class="facts">
     <div><dt>Problem</dt><dd>Employees forget to log attendance, missing data causes payroll errors and HR fixes records by hand at month end.</dd></div>
     <div><dt>Solution</dt><dd>Reminders at a self-set time, one-tap check-in for morning shift, afternoon shift or leave, a monthly calendar report and a widget.</dd></div>
-    <div><dt>Role</dt><dd>BA: discovery, user stories, BRD v1 and v2, BPMN; handed over screen specs and design tokens.</dd></div>
+    <div><dt>Role</dt><dd>BA: discovery, BRD, BPMN; handed over screen specs and design tokens.</dd></div>
   </dl>
 
-  <ul class="tags"><li>BRD v1 → v2</li><li>User Stories</li><li>BPMN</li><li>Design tokens</li><li>Home spec (EN)</li><li>SwiftUI iPhone</li><li>SwiftUI Mac</li><li>Widget</li></ul>
+  <ul class="tags"><li>BRD</li><li>BPMN</li><li>Design tokens</li><li>Home spec (EN)</li><li>SwiftUI iPhone</li><li>SwiftUI Mac</li><li>Widget</li></ul>
 
   <a class="cta" href="demo/time/index.html">Open the interactive demo <span aria-hidden="true">→</span></a>
 
   <div class="more">
     <details><summary>Scope</summary><ul>
-      <li>v1: registration, login, account management, 9:00 AM reminder, 17 user stories across 7 epics</li>
-      <li>v2: login removed, because it is a personal tool that runs on the device with no server</li>
+      <li>Early draft: registration, login, account management and a 9:00 AM reminder</li>
+      <li>Final scope: login removed, because it is a personal tool that runs on the device with no server</li>
       <li>Added morning shift (8 hours), afternoon shift (4 hours), leave day, attendance period by cutoff date, CSV import/export and per-day record editing</li>
       <li>Out of scope for phase 1: leave approval, payroll integration, biometric/GPS, team reports, multi-device sync</li>
-      <li>Estimated 3 months: design 1, development 1.5, testing 0.5; team of 6 (PM, BA, 2 mobile, BE, tester, UI/UX)</li></ul><p class="doclinks"><a href="docs/time/TimeApp_BRD_v2.pdf#page=1" target="_blank" rel="noopener">BRD ↗</a><a href="docs/time/TimeApp_User_Stories_AC.pdf" target="_blank" rel="noopener">User stories &amp; AC ↗</a></p></details>
+      <li>Estimated 3 months: design 1, development 1.5, testing 0.5; team of 6 (PM, BA, 2 mobile, BE, tester, UI/UX)</li></ul><p class="doclinks"><a href="docs/time/TimeApp_BRD.pdf#page=1" target="_blank" rel="noopener">BRD ↗</a></p></details>
     <details><summary>Business flow</summary><ol>
       <li>Daily reminder at the configured time (default 08:45), skipped if already checked in</li>
       <li>Choose shift: morning, afternoon or leave</li>
@@ -140,7 +140,7 @@
       <li>Non-functional: performance (check-in under 2 seconds, notifications within 30 seconds), iOS 14+ and Android 10+, accessibility (WCAG AA, 44px touch targets, never color alone), dark mode, local data storage, notification permission, critical bug fix within 24 hours</li></ul></details>
     <details><summary>Product and design</summary><ul>
       <li>iPhone app in SwiftUI: home, report, profile and splash screens</li>
-      <li>Interactive web prototype of the app (check-in, lunch pause, reminders, report calendar, profile) built from the Home spec and BRD v2, with a simulated clock</li>
+      <li>Interactive web prototype of the app (check-in, lunch pause, reminders, report calendar, profile) built from the Home spec and the BRD, with a simulated clock</li>
       <li>Mac app in SwiftUI with the same logic and widget, sharing data through an App Group</li>
       <li>Notification manager and a local data service behind a protocol, about 7,000 lines of Swift</li>
       <li>Design tokens (primary green, dark green when the goal is reached, light and dark backgrounds) and an English Home screen spec</li>
